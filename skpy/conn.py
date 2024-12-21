@@ -156,7 +156,7 @@ class SkypeConnection(SkypeObj):
     extSess = requests.Session()
     extSess.headers["User-Agent"] = USER_AGENT
 
-    def __init__(self):
+    def __init__(self, proxy: dict = {}):
         """
         Create a new, unconnected instance.
         """
@@ -167,6 +167,8 @@ class SkypeConnection(SkypeObj):
         self.hasUserPwd = False
         self.msgsHost = self.API_MSGSHOST
         self.sess = requests.Session()
+        if proxy:
+            self.sess.proxies = proxy
         self.sess.headers["User-Agent"] = self.USER_AGENT
         self.endpoints = {"self": SkypeEndpoint(self, "SELF")}
         self.syncStates = {}
