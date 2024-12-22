@@ -199,7 +199,7 @@ class SkypeConnection(SkypeObj):
             return method(*args, **kwargs)
         return MethodType(inner, self)
 
-    def __call__(self, method, url, codes=(200, 201, 202, 204, 207), auth=None, headers=None, **kwargs):
+    def __call__(self, method, url, codes=(200, 201, 202, 204, 207), auth=None, headers=None, proxy={}, **kwargs):
         """
         Make an API call.  Most parameters are passed directly to :mod:`requests`.
 
@@ -223,6 +223,8 @@ class SkypeConnection(SkypeObj):
             .SkypeApiException: if a successful status code is not received
         """
         self.verifyToken(auth)
+        if proxy:
+            self.sess.proxies = proxy
         if not headers:
             headers = {}
         debugHeaders = dict(headers)

@@ -205,7 +205,7 @@ class SkypeChat(SkypeObj):
         return self.sendRaw(editId=edit, messagetype=msgType, content=content,
                             imdisplayname="{0}".format(self.skype.user.name), **kwargs)
 
-    def sendFile(self, content, name, image=False):
+    def sendFile(self, content, name, image=False, proxy={}):
         """
         Upload a file to the conversation.  Content should be an ASCII or binary file-like object.
 
@@ -223,10 +223,17 @@ class SkypeChat(SkypeObj):
                 "permissions": dict(("8:{0}".format(id), ["read"]) for id in self.userIds)}
         if not image:
             meta["filename"] = name
-        objId = self.skype.conn("POST", "https://api.asm.skype.com/v1/objects",
-                                auth=SkypeConnection.Auth.Authorize,
-                                headers={"X-Client-Version": "0/0.0.0.0"},
-                                json=meta).json()["id"]
+        if proxy:
+            objId = self.skype.conn("POST", "https://api.asm.skype.com/v1/objects",
+                                    proxy=proxy,
+                                    auth=SkypeConnection.Auth.Authorize,
+                                    headers={"X-Client-Version": "0/0.0.0.0"},
+                                    json=meta).json()["id"]
+        else:           
+            objId = self.skype.conn("POST", "https://api.asm.skype.com/v1/objects",
+                                    auth=SkypeConnection.Auth.Authorize,
+                                    headers={"X-Client-Version": "0/0.0.0.0"},
+                                    json=meta).json()["id"]
         objType = "imgpsh" if image else "original"
         urlFull = "https://api.asm.skype.com/v1/objects/{0}".format(objId)
         self.skype.conn("PUT", "{0}/content/{1}".format(urlFull, objType),
